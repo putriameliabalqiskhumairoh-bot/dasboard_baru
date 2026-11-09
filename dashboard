@@ -1,0 +1,2959 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIIRRR - Monitoring Ikan Koi</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+
+/* =================================
+   ROOT / VARIABEL WARNA
+================================= */
+
+     /* =================================
+   ROOT / VARIABEL WARNA
+================================= */
+
+        :root {
+            --bg-body: #eef7fb;
+            --sidebar-bg: #16697a;
+            --header-bg: #489fb5;
+
+            /* WARNA CARD - UBAH DI SINI */
+            --card-bg: #092B57;      /* card kolam, card pH, kartu mini stok */
+            --card-bg2: #489fb5;     /* card sensor, stok, jadwal */
+            --card-inner: #15355A;   /* kotak di dalam card */
+            --card-acidity: #092B57;
+
+            --accent-cyan: #00e5ff;
+            --accent-green: #00ffa3;
+            --accent-red: #ff4d4d;
+
+            --text-white: #ffffff;
+            --text-color: #ffffff;
+            --text-muted: #94a3b8;
+
+            --shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        /* =================================
+        RESET
+        ================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--text-white);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* =================================
+        SIDEBAR
+        ================================= */
+
+        aside {
+            width: 220px;
+            min-width: 220px;
+            flex: 0 0 220px;
+            background-color: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 25px 0;
+            z-index: 100;
+        }
+
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .logo {
+            padding: 0 30px;
+            margin-bottom: 60px;
+        }
+
+        .logo h1 {
+            color: var(--accent-cyan);
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+
+        .logo span {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            display: block;
+            margin-top: 5px;
+        }
+
+        nav ul {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 5px 20px;
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            gap: 10px;
+        }
+
+        .nav-link i {
+            margin-right: 15px;
+            width: 20px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(0, 229, 255, 0.15);
+            color: var(--accent-cyan);
+        }
+
+        /* =================================
+        MAIN CONTENT
+        ================================= */
+
+        main {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+            overflow-y: auto;
+            padding-bottom: 50px;
+        }
+
+        /* =================================
+        HEADER GLASSY
+        ================================= */
+
+        header {
+            width: 100%;
+            height: 45px;
+            padding: 0 20px;
+
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+
+            background: rgba(72, 159, 181, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.12);
+
+            position: sticky;
+            top: 0;
+            z-index: 90;
+
+            transition: background 0.3s ease,
+                        box-shadow 0.3s ease;
+        }
+
+        header.scrolled {
+            background: rgba(15, 35, 75, 0.45);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #4f5b6c;
+            cursor: pointer;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .icon-btn:hover {
+            color: var(--accent-cyan);
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid var(--accent-cyan);
+            box-shadow: var(--shadow);
+            object-fit: cover;
+        }
+
+        /* =================================
+        PAGES
+        ================================= */
+
+        .page {
+            display: none;
+            padding: 0 30px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =================================
+        DASHBOARD BERANDA
+        ================================= */
+
+        #beranda {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            padding: 25px;
+            width: 100%;
+            color: var(--text-color);
+        }
+
+        #beranda * {
+            box-sizing: border-box;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .section-heading h2 {
+            margin: 0 0 6px;
+            font-size: 21px;
+            font-weight: 700;
+            color:#15355A;
+        }
+
+        .section-heading p {
+            margin: 0;
+            font-size: 13px;
+            color: #15355A;
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: #36d399;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(54,211,153,0.5);
+        }
+
+        /* =================================
+        GRID KOLAM DAN SENSOR
+        ================================= */
+
+        .kolam-grid,
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        /* =================================
+        CARD UTAMA
+        ================================= */
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Style bersama (TANPA warna background) */
+        .kolam-grid .card,
+        .sensor-grid .card {
+            min-width: 0;
+            width: 100%;
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+
+            transition: transform 0.25s ease,
+                        box-shadow 0.25s ease,
+                        border-color 0.25s ease;
+        }
+
+        /* WARNA DIPISAH PER GRID */
+        .kolam-grid .card  { background-color: var(--card-bg); }
+        .sensor-grid .card { background-color: var(--card-bg2); }
+        .sensor-grid .card.acidity-card { background-color: var(--card-acidity); }
+
+        .kolam-grid .card:hover,
+        .sensor-grid .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.2);
+            border-color: rgba(89,190,255,0.3);
+        }
+
+        /* =================================
+        GAMBAR KOLAM
+        ================================= */
+
+        .kolam-img {
+            height: 130px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            background: var(--header-bg);
+            margin-bottom: 18px;
+        }
+
+        .kolam-img img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .kolam-card:hover .kolam-img img {
+            transform: scale(1.04);
+        }
+
+        .tag-kolam {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+            padding: 7px 11px;
+            background: rgba(5,28,56,0.78);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* =================================
+        HEADER CARD
+        ================================= */
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .card-header > i,
+        .card-header > svg {
+            width: 21px;
+            height: 21px;
+            color: #ffffff;   /* sebelumnya #092B57 */
+        }
+
+        .card-title-sm {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .card-subtitle {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #ffffff;
+        }
+
+        /* =================================
+        STATISTIK KOLAM
+        ================================= */
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 12px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 13px;
+            background: var(--card-inner);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            color: #9fb5d0;
+        }
+
+        .stat-val {
+            font-size: 23px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .green {
+            color: #45dfa8;
+        }
+
+        .red {
+            color: #ff727d;
+        }
+
+        /* =================================
+        FOOTER CARD
+        ================================= */
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.09);
+        }
+
+        .live-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #b7c9de;
+        }
+
+        .live-status .dot {
+            width: 7px;
+            height: 7px;
+            background: #39d99b;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(57,217,155,0.5);
+        }
+
+        /* =================================
+        CARD PERINGATAN
+        ================================= */
+
+        .warning-content {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            min-height: 80px;
+        }
+
+        .warning-num {
+            font-size: 54px;
+            line-height: 1;
+            font-weight: 800;
+            color: #ffbd59;
+        }
+
+        .warning-content h3 {
+            margin: 0 0 7px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .warning-content p {
+            margin: 0;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #9fb5d0;
+        }
+
+        .icon-box {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.07);
+            color: #5fd7ff;
+        }
+
+        .icon-box svg {
+            width: 21px;
+            height: 21px;
+        }
+
+        .warning-icon {
+            color: #ffbd59;
+            background: rgba(255,189,89,0.1);
+        }
+
+        .warning-status {
+            font-size: 10px;
+            font-weight: 600;
+            color: #ffbd59;
+        }
+
+        /* =================================
+        GAUGE PH
+        ================================= */
+
+        .acidity-card .card-header {
+            margin-bottom: 0;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 120px;
+            max-width: 100%;
+            aspect-ratio: 1;
+            margin: 12px auto;
+        }
+
+        .gauge-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            transform: rotate(-90deg);
+            overflow: visible;
+        }
+
+        .gauge-bg,
+        .gauge-progress {
+            fill: none;
+            stroke-width: 10;
+        }
+
+        .gauge-bg {
+            stroke: rgba(255,255,255,0.09);
+        }
+
+        .gauge-progress {
+            stroke: #43dda5;
+            stroke-linecap: round;
+            stroke-dasharray: 408.4;
+            stroke-dashoffset: 75;
+            filter: drop-shadow(0 0 5px rgba(67,221,165,0.2));
+        }
+
+        .gauge-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-val {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .gauge-label {
+            margin-top: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #43dda5;
+        }
+
+        .stability-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: #43dda5;
+        }
+
+        /* =================================
+        JADWAL PAKAN
+        ================================= */
+
+        .feeder-icon {
+            color: #66d9ff;
+        }
+
+        .automation-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 14px 0;
+            padding: 15px 12px;
+            border-radius: 12px;
+            background: var(--card-inner);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .container-icon {
+            color: #66d9ff;
+            background: rgba(102,217,255,0.1);
+        }
+
+        .feeder-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .feeder-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .feeder-desc {
+            margin-top: 5px;
+            font-size: 10px;
+            color: #9fb5d0;
+            line-height: 1.4;
+        }
+
+        .feeder-status {
+            font-size: 11px;
+            font-weight: 700;
+            color: #43dda5;
+        }
+
+        .feeder-off {
+            color: #ff727d;
+        }
+
+        /* =================================
+        TOGGLE SWITCH
+        ================================= */
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            flex-shrink: 0;
+            width: 42px;
+            height: 23px;
+        }
+
+        .switch input {
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            cursor: pointer;
+            border-radius: 30px;
+            background: #52657c;
+            transition: 0.3s;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            width: 17px;
+            height: 17px;
+            left: 3px;
+            top: 3px;
+            border-radius: 50%;
+            background: #ffffff;
+            transition: 0.3s;
+        }
+
+        .switch input:checked + .slider {
+            background: #26bf8a;
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(19px);
+        }
+
+        .switch input:focus-visible + .slider {
+            outline: 2px solid #66d9ff;
+            outline-offset: 3px;
+        }
+
+        /* =================================
+        POPUP / NOTIFIKASI
+        ================================= */
+
+        .popup,
+        .notif-popup {
+            position: absolute;
+            top: 80px;
+            right: 30px;
+            background: white;
+            width: 300px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            color: #1e293b;
+            padding: 20px;
+            display: none;
+            z-index: 200;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .popup-header,
+        .notif-header {
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: var(--sidebar-bg);
+        }
+
+        .notif-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .notif-dot {
+            width: 8px;
+            height: 8px;
+            flex-shrink: 0;
+            background: var(--accent-red);
+            border-radius: 50%;
+            margin-top: 4px;
+        }
+
+        /* =================================
+        PROFILE PAGE
+        ================================= */
+
+        .profile-card {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            display: flex;
+            gap: 40px;
+            box-shadow: var(--shadow);
+            max-width: 1000px;
+            margin: 24px auto 0;
+        }
+
+        .profile-left {
+            text-align: center;
+        }
+
+        .profile-img-lg {
+            width: 180px;
+            height: 180px;
+            border-radius: 40px;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 5px solid #f1f5f9;
+        }
+
+        .profile-right {
+            flex: 1;
+        }
+
+        .profile-right h2 {
+            font-size: 32px;
+            color: var(--sidebar-bg);
+            margin-bottom: 5px;
+        }
+
+        .profile-right p {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .info-item label {
+            font-size: 12px;
+            color: #94a3b8;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .info-item span {
+            font-weight: 700;
+            color: var(--sidebar-bg);
+            font-size: 16px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .btn-edit {
+            background: var(--sidebar-bg);
+            color: white;
+        }
+
+        .btn-logout {
+            background: #fee2e2;
+            color: #ef4444;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* =================================
+        MONITORING PH
+        ================================= */
+
+        .ph-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .ph-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+
+        .ph-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .ph-card-header h3 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .ph-card-header p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .ph-card-header .wave-icon {
+            color: var(--accent-green);
+            opacity: 0.8;
+        }
+
+        .ph-content-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .ph-gauge-wrapper {
+            position: relative;
+            width: 110px;
+            height: 110px;
+        }
+
+        .ph-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .ph-circle.normal {
+            border-top-color: var(--accent-green);
+            border-right-color: var(--accent-green);
+        }
+
+        .ph-circle.danger {
+            border-top-color: var(--accent-red);
+            border-right-color: var(--accent-red);
+        }
+
+        .ph-stats-side {
+            text-align: right;
+        }
+
+        .ph-stats-side .label-small {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .ph-stats-side .val-small {
+            font-size: 11px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .ph-stats-side .condition {
+            font-size: 12px;
+            color: white;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .btn-instant-feed {
+            width: 100%;
+            background-color: var(--accent-cyan);
+            color: var(--sidebar-bg);
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-instant-feed:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        /* =================================
+        STOK DAN RIWAYAT
+        ================================= */
+
+        .stok-layout {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .stok-status-card {
+            flex: 1;
+            background-color: var(--card-bg2);
+            border-radius: 24px;
+            padding: 30px;
+            color: white;
+        }
+
+        .stok-item {
+            margin-bottom: 25px;
+        }
+
+        .stok-info-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 8px;
+        }
+
+        .stok-info-top span:first-child {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stok-info-top .percent {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+
+        .progress-track {
+            height: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease-in-out;
+        }
+
+        .stok-info-bottom {
+            text-align: right;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .riwayat-tabel-card {
+            flex: 1.5;
+            background-color: var(--card-bg2);
+            border-radius: 24px;
+            padding: 30px;
+            color: white;
+        }
+
+        .tabel-header-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            border-radius: 12px;
+            padding: 10px 15px;
+            color: white;
+            font-size: 13px;
+            width: 250px;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .custom-table th {
+            text-align: left;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            padding: 15px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .custom-table td {
+            padding: 20px 10px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .status-pill {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .status-berhasil {
+            background: rgba(0,255,163,0.1);
+            color: var(--accent-green);
+        }
+
+        .status-manual {
+            background: rgba(255,77,77,0.1);
+            color: var(--accent-red);
+        }
+
+        .bottom-stok-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-mini-card {
+            background: var(--card-bg);
+            padding: 20px 30px;
+            border-radius: 20px;
+            min-width: 200px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-mini-card span {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-mini-card h3 {
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+        }
+
+        /* =================================
+        JADWAL PAKAN / TIMELINE
+        ================================= */
+
+        .schedule-container {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .timeline-card {
+            flex: 1.6;
+            background: var(--card-bg2);
+            border-radius: 24px;
+            padding: 30px;
+            color: white;
+        }
+
+        .timeline-list {
+            position: relative;
+            margin-top: 30px;
+            padding-left: 40px;
+        }
+
+        .timeline-list::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .timeline-item {
+            position: relative;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -35px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: var(--card-bg);
+            border: 3px solid var(--accent-cyan);
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .timeline-time {
+            color: var(--accent-green);
+            font-weight: 800;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+
+        .history-card {
+            flex: 1;
+            background: var(--card-bg2);
+            border-radius: 24px;
+            padding: 30px;
+            color: white;
+        }
+
+        .history-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--accent-cyan);
+        }
+
+        .history-item.fail {
+            border-left-color: var(--accent-red);
+        }
+
+        /* =================================
+        ARTICLE CARDS
+        ================================= */
+
+        .article-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .article-card {
+            height: 200px;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 25px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .article-card img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: brightness(0.6);
+        }
+
+        /* =================================
+        MODAL
+        ================================= */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 600px;
+            max-width: 95%;
+            border-radius: 32px;
+            padding: 35px;
+            color: #1e293b;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #64748b;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 15px;
+            background: #f1f5f9;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent-cyan);
+            outline: none;
+        }
+
+        .days-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .day-chip {
+            width: 55px;
+            height: 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .day-chip.active {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: rgba(0,229,255,0.05);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .btn-cancel,
+        .btn-save {
+            flex: 1;
+            padding: 18px;
+            border-radius: 18px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background: white;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-save {
+            background: var(--sidebar-bg);
+            color: white;
+            border: none;
+            box-shadow: 0 10px 20px rgba(6,26,55,0.3);
+        }
+
+        /* =================================
+        KETERBACAAN TEKS DI CARD SENSOR (latar teal)
+        ================================= */
+
+        .sensor-grid .card .warning-content p,
+        .sensor-grid .card .feeder-desc,
+        .sensor-grid .card .stat-label,
+        .sensor-grid .card .live-status {
+            color: rgba(255,255,255,0.88);
+        }
+
+                .kolam-grid,
+        .sensor-grid {
+            max-width: 880px;
+            gap: 14px;
+        }
+
+        #beranda {
+            gap: 22px;
+        }
+
+        .section-heading {
+            margin-bottom: 12px;
+        }
+
+        .section-heading h2 {
+            font-size: 18px;
+        }
+
+        /* Card */
+        .kolam-grid .card,
+        .sensor-grid .card {
+            padding: 12px;
+            border-radius: 14px;
+        }
+
+        /* Gambar kolam */
+        .kolam-img {
+            height: 100px;
+            margin-bottom: 10px;
+        }
+
+        /* Judul card */
+        .card-header {
+            margin: 10px 0;
+        }
+
+        .card-header h3 {
+            font-size: 15px;
+        }
+
+        /* Kotak NEXT PAKAN / pH AIR */
+        .stat-row {
+            gap: 8px;
+        }
+
+        .stat-box {
+            padding: 9px;
+            gap: 4px;
+        }
+
+        .stat-val {
+            font-size: 19px;
+        }
+
+        /* Footer card */
+        .card-footer {
+            margin-top: 10px;
+            padding-top: 9px;
+        }
+
+        /* Card Peringatan */
+        .warning-content {
+            min-height: 60px;
+            gap: 12px;
+        }
+
+        .warning-num {
+            font-size: 40px;
+        }
+
+        /* Icon box */
+        .icon-box {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+        }
+
+        .icon-box svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Gauge pH */
+        .gauge-container {
+            width: 100px;
+            margin: 8px auto;
+        }
+
+        .gauge-val {
+            font-size: 26px;
+        }
+
+        /* Automatic Feeder */
+        .automation-item {
+            margin: 10px 0;
+            padding: 10px;
+        }
+
+         .ph-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        max-width: 900px;
+        gap: 14px;
+        margin-top: 14px;
+        }
+
+        .ph-card {
+            padding: 14px;
+            border-radius: 16px;
+        }
+
+        .ph-card-header {
+            margin-bottom: 12px;
+        }
+
+        .ph-card-header h3 {
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .ph-card-header p {
+            font-size: 11px;
+        }
+
+        .ph-content-row {
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        .ph-gauge-wrapper {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .ph-circle {
+            border-width: 6px;
+            font-size: 18px;
+        }
+
+        .ph-stats-side .label-small {
+            font-size: 8px;
+            margin-top: 6px;
+        }
+
+        .ph-stats-side .val-small {
+            font-size: 10px;
+        }
+
+        .ph-stats-side .condition {
+            font-size: 11px;
+        }
+
+        .btn-instant-feed {
+            padding: 9px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        /* =================================
+   MODE COMPACT - STOK DAN RIWAYAT
+================================= */
+
+        .stok-layout {
+            max-width: 960px;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .stok-status-card,
+        .riwayat-tabel-card {
+            padding: 16px;
+            border-radius: 16px;
+        }
+
+        /* Status Stok */
+        .stok-item {
+            margin-bottom: 12px;
+        }
+
+        .stok-info-top {
+            margin-bottom: 4px;
+        }
+
+        .stok-info-top span:first-child {
+            font-size: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .stok-info-top .percent {
+            font-size: 16px;
+        }
+
+        .progress-track {
+            height: 7px;
+            margin-bottom: 4px;
+        }
+
+        .stok-info-bottom {
+            font-size: 9px;
+        }
+
+        /* Riwayat Pemberian */
+        .tabel-header-actions {
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            width: 180px;
+            padding: 7px 10px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        .custom-table {
+            margin-top: 4px;
+        }
+
+        .custom-table th {
+            font-size: 9px;
+            padding: 8px 6px;
+        }
+
+        .custom-table td {
+            padding: 9px 6px;
+            font-size: 12px;
+        }
+
+        .status-pill {
+            padding: 3px 9px;
+            font-size: 9px;
+        }
+
+        /* Kartu mini di bawah */
+        .bottom-stok-stats {
+            gap: 12px;
+        }
+
+        .stat-mini-card {
+            padding: 12px 18px;
+            min-width: 150px;
+            border-radius: 14px;
+        }
+
+        .stat-mini-card h3 {
+            font-size: 20px;
+        }
+
+        /* Keterbacaan di latar teal */
+        .stok-status-card .stok-info-top span:first-child,
+        .custom-table th {
+            color: rgba(255,255,255,0.85);
+        }
+        
+        /* =================================
+        MODE COMPACT - JADWAL PAKAN
+        ================================= */
+
+        .schedule-container {
+            max-width: 960px;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .timeline-card,
+        .history-card {
+            padding: 16px;
+            border-radius: 16px;
+        }
+
+        /* Timeline */
+        .timeline-list {
+            margin-top: 14px;
+            padding-left: 30px;
+        }
+
+        .timeline-list::before {
+            left: 6px;
+        }
+
+        .timeline-item {
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+        }
+
+        .timeline-item::before {
+            left: -31px;
+            width: 10px;
+            height: 10px;
+            border-width: 2px;
+        }
+
+        .timeline-time {
+            font-size: 15px;
+            margin-right: 10px;
+        }
+
+        /* Riwayat */
+        .history-item {
+            padding: 9px 12px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            border-left-width: 3px;
+        }
+
+        /* Keterbacaan di latar teal */
+        .timeline-item p,
+        .timeline-item small,
+        .history-item p,
+        .history-item small {
+            color: rgba(255,255,255,0.85);
+        }
+
+        /* Kartu stat di bawah (Sisa Stok, Target) */
+        .bottom-stok-stats {
+            max-width: 960px;
+            gap: 12px;
+        }
+
+        .stat-mini-card {
+            padding: 10px 16px;
+            min-width: 150px;
+            border-radius: 12px;
+        }
+
+        .stat-mini-card h3 {
+            font-size: 20px;
+        }
+
+        /* Kartu artikel */
+        .article-grid {
+            max-width: 960px;
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .article-card {
+            height: 120px;
+            padding: 14px;
+            border-radius: 16px;
+        }
+
+        /* =================================
+        RESPONSIVE TABLET
+        ================================= */
+
+        @media (max-width: 1024px) {
+            .kolam-grid,
+            .sensor-grid,
+            .ph-grid {
+                grid-template-columns: repeat(2, minmax(0,1fr));
+            }
+
+            #beranda {
+                padding: 20px;
+                gap: 28px;
+            }
+
+            .stok-layout,
+            .schedule-container {
+                flex-direction: column;
+            }
+        }
+
+        /* =================================
+        RESPONSIVE HP
+        ================================= */
+
+        @media (max-width: 600px) {
+            aside {
+                width: 65px;
+                min-width: 65px;
+                flex-basis: 65px;
+            }
+
+            .logo {
+                padding: 0 5px;
+            }
+
+            .logo h1 {
+                font-size: 20px;
+            }
+
+            .logo span {
+                display: none;
+            }
+
+            .nav-item {
+                padding: 5px;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 12px 5px;
+                font-size: 0;
+            }
+
+            .nav-link i {
+                margin: 0;
+            }
+
+            #beranda {
+                padding: 14px;
+                gap: 24px;
+            }
+
+            .page {
+                padding: 0 12px;
+            }
+
+            .kolam-grid,
+            .sensor-grid,
+            .ph-grid {
+                grid-template-columns: minmax(0,1fr);
+                gap: 16px;
+            }
+
+            .section-heading {
+                align-items: flex-start;
+            }
+
+            .section-heading h2 {
+                font-size: 18px;
+            }
+
+            .section-heading p {
+                font-size: 11px;
+                line-height: 1.5;
+            }
+
+            .section-badge {
+                font-size: 10px;
+            }
+
+            .kolam-img {
+                height: 190px;
+            }
+
+            .kolam-grid .card,
+            .sensor-grid .card {
+                padding: 15px;
+            }
+
+            .warning-num {
+                font-size: 46px;
+            }
+
+            .profile-card {
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .info-grid,
+            .form-grid,
+            .article-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-stok-stats {
+                flex-wrap: wrap;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .custom-table {
+                min-width: 500px;
+            }
+
+            .riwayat-tabel-card {
+                overflow-x: auto;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+        }
+
+        /* =================================
+        REDUCE MOTION
+        ================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* =================================
+        PEMISAH HALAMAN (WAJIB PALING BAWAH)
+        ================================= */
+
+        .page {
+            display: none !important;
+        }
+
+        .page.active {
+            display: block !important;
+        }
+
+        #beranda.active {
+            display: flex !important;
+        }
+
+                /* =================================
+        TEMA WARNA - PALET TEAL & ORANGE
+        ================================= */
+
+        /* ---------- Sidebar ---------- */
+        .nav-link {
+            color: #D5E8EC;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.12);
+            color: #ffffff;
+        }
+        .nav-link.active {
+            background: #FFA62B;
+            color: #0F3F49;
+            font-weight: 700;
+        }
+
+        /* ---------- Header ---------- */
+        header.scrolled {
+            background: rgba(22,105,122,0.55);
+        }
+        .icon-btn {
+            color: #16697A;
+        }
+
+        /* ---------- Judul bagian di latar terang ---------- */
+        .section-heading h2 {
+            color: #16697A;
+        }
+        .section-heading p {
+            color: #3F6B76;
+        }
+        .section-badge {
+            background: rgba(22,105,122,0.1);
+            border: 1px solid rgba(22,105,122,0.2);
+            color: #16697A;
+        }
+        .section-badge .status-dot {
+            background: #2FA87A;
+            box-shadow: none;
+        }
+
+        /* ---------- Card ---------- */
+        .kolam-grid .card:hover,
+        .sensor-grid .card:hover {
+            border-color: rgba(255,166,43,0.55);
+        }
+        .tag-kolam {
+            background: rgba(15,63,73,0.78);
+        }
+        .card-footer {
+            border-top-color: rgba(255,255,255,0.18);
+        }
+        .live-status {
+            color: #D5E8EC;
+        }
+        .green { color: #8FE0B8; }
+        .red   { color: #FF9A8B; }
+
+        /* Panel dalam card: gelap supaya teks berwarna tetap terbaca */
+        .stat-box,
+        .automation-item,
+        .timeline-item,
+        .history-item {
+            background: var(--card-inner);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .timeline-item[style] {
+            background: var(--card-inner) !important;
+        }
+
+        /* Ikon */
+        .icon-box {
+            background: var(--card-inner);
+            color: #FFA62B;
+        }
+        .warning-icon,
+        .feeder-icon {
+            color: #FFA62B;
+        }
+        .container-icon {
+            color: #FFA62B;
+            background: rgba(255,166,43,0.15);
+        }
+
+        /* ---------- Card sensor ---------- */
+        .warning-num {
+            color: #ffffff;
+        }
+        .warning-content p,
+        .stat-label {
+            color: #E4F0F2;
+        }
+
+        .warning-status,
+        .stability-value,
+        .feeder-status {
+            background: var(--card-inner);
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+        .warning-status   { color: #FFA62B; }
+        .stability-value  { color: #8FE0B8; }
+        .feeder-status    { color: #8FE0B8; }
+        .feeder-off       { color: #FF8A78; }
+
+        .gauge-bg {
+            stroke: rgba(15,82,96,0.35);
+        }
+        .gauge-progress {
+            stroke: #FFA62B;
+            filter: none;
+        }
+        .gauge-label {
+            color: #ffffff;
+        }
+
+        /* ---------- Monitoring pH ---------- */
+        .ph-circle {
+            border-color: rgba(255,255,255,0.12);
+        }
+        .ph-circle.normal {
+            border-top-color: #8FE0B8;
+            border-right-color: #8FE0B8;
+        }
+        .ph-circle.danger {
+            border-top-color: #FF8A78;
+            border-right-color: #FF8A78;
+        }
+        .btn-instant-feed {
+            background-color: #FFA62B;
+            color: #0F3F49;
+        }
+
+        /* ---------- Stok ---------- */
+        .stok-info-top span:first-child {
+            color: rgba(255,255,255,0.9);
+        }
+        .stok-info-top .percent {
+            background: var(--card-inner);
+            padding: 2px 10px;
+            border-radius: 8px;
+        }
+        .stok-info-bottom {
+            width: fit-content;
+            margin-left: auto;
+            background: var(--card-inner);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+        .progress-track {
+            background: rgba(15,82,96,0.45);
+        }
+        .search-box {
+            background: rgba(15,82,96,0.35);
+        }
+        .search-box::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        .custom-table th,
+        .custom-table td {
+            border-bottom-color: rgba(255,255,255,0.15);
+        }
+        .status-pill {
+            background: var(--card-inner);
+        }
+        .status-berhasil { color: #8FE0B8; }
+        .status-manual   { color: #FF8A78; }
+
+        /* ---------- Jadwal ---------- */
+        .timeline-time {
+            color: #FFA62B;
+        }
+        .timeline-list::before {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* Dua kartu stat di bawah (warna biru & hijau lama) */
+        #jadwal .card[style*="#dbeafe"] {
+            background: #82C0CC !important;
+            color: #0F3F49 !important;
+        }
+        #jadwal .card[style*="#dcfce7"] {
+            background: #FFDFAE !important;
+            color: #7A4300 !important;
+        }
+
+        /* Tombol Tambah Jadwal */
+        #jadwal .btn[onclick="toggleModal(true)"] {
+            color: #0F3F49 !important;
+        }
+
+        /* Label kecil di kartu artikel */
+        .article-card span {
+            color: #0F3F49 !important;
+        }
+
+        /* ---------- Modal ---------- */
+        .day-chip.active {
+            border-color: #FFA62B;
+            color: #B86A00;
+            background: rgba(255,166,43,0.12);
+        }
+
+    </style>
+</head>
+<body>
+
+      <!-- SIDEBAR -->
+    <aside>
+        <div class="brand-header">
+            <div class="logo">
+                <h1>AIIRRR</h1>
+                <span>MONITORING IKAN KOI</span>
+            </div>
+        </div>
+
+        <nav>
+            <ul>
+                <li class="nav-item">
+                    <a class="nav-link active" onclick="showPage('beranda', this)">
+                        <i data-lucide="layout-grid"></i> Beranda
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showPage('monitoring', this)">
+                        <i data-lucide="droplets"></i> Monitoring pH
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showPage('stok', this)">
+                        <i data-lucide="box"></i> Stok
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showPage('jadwal', this)">
+                        <i data-lucide="calendar"></i> Jadwal
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <header>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="togglePopup('notifPopup')">
+                    <i data-lucide="bell"></i>
+                </button>
+                <img src="https://lh3.googleusercontent.com/a/ACg8ocKn4Hlc5Ntn3JzA_ALHbW59BOMD5AwA_HMvyDEX3RLb7Us2d8cI=s360-c-no" class="avatar" onclick="showPage('profile', null)">
+
+                <!-- Notif Popup -->
+                <div id="notifPopup" class="popup">
+                    <div class="popup-header">Notifikasi Terbaru</div>
+                    <div class="notif-item">
+                        <div class="notif-dot"></div>
+                        <div>
+                            <strong>Peringatan pH!</strong><br>
+                            Kolam 2 mendeteksi pH rendah (5.6).
+                        </div>
+                    </div>
+                    <div class="notif-item">
+                        <div class="notif-dot" style="background: var(--accent-green)"></div>
+                        <div>
+                            <strong>Jadwal Selesai</strong><br>
+                            Pemberian pakan pagi Kolam 1 berhasil.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================= -->
+        <!-- PAGE: BERANDA                 -->
+        <!-- ============================= -->
+        <section id="beranda" class="page active">
+
+            <!-- MONITORING KOLAM -->
+            <div class="kolam-section">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>Monitoring Kolam</h2>
+                        <p>Pantau kondisi setiap kolam secara real-time</p>
+                    </div>
+                    <span class="section-badge">
+                        <span class="status-dot"></span>
+                        3 Kolam Terdaftar
+                    </span>
+                </div>
+
+                <div class="kolam-grid">
+
+                    <!-- KOLAM 1 -->
+                    <div class="card kolam-card">
+                        <div class="kolam-img">
+                            <span class="tag-kolam">Kolam Utama</span>
+                            <img
+                                src="https://images.unsplash.com/photo-1616989161881-6c788f319bd7?q=80&w=1170&auto=format&fit=crop"
+                                alt="Gambar Kolam 1"
+                            >
+                        </div>
+
+                        <div class="card-header">
+                            <h3>Kolam 1</h3>
+                            <i data-lucide="waves"></i>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="stat-box">
+                                <span class="stat-label">NEXT PAKAN</span>
+                                <span class="stat-val">17.15</span>
+                            </div>
+
+                            <div class="stat-box">
+                                <span class="stat-label">pH AIR</span>
+                                <span class="stat-val green">7.5</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="live-status">
+                                <div class="dot"></div>
+                                Live Monitoring
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KOLAM 2 (kosong) -->
+
+                    <!-- KOLAM 3 (kosong) -->
+
+                </div>
+            </div>
+
+            <!-- MONITORING SENSOR -->
+            <div class="sensor-section">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>Monitoring Sensor</h2>
+                        <p>Informasi kondisi air dan otomatisasi sistem</p>
+                    </div>
+                    <span class="section-badge">
+                        <span class="status-dot"></span>
+                        Status Sistem
+                    </span>
+                </div>
+
+                <div class="sensor-grid">
+
+                    <!-- CARD PERINGATAN -->
+                    <div class="card bottom-card warning-card">
+
+                        <div class="card-header">
+                            <div>
+                                <span class="card-title-sm">Peringatan</span>
+                                <div class="card-subtitle">Ringkasan masalah kolam</div>
+                            </div>
+
+                            <div class="icon-box warning-icon">
+                                <i data-lucide="shield-alert"></i>
+                            </div>
+                        </div>
+
+                        <div class="warning-content">
+                            <span class="warning-num">2</span>
+                            <div>
+                                <h3>Isu Terdeteksi</h3>
+                                <p>Periksa kondisi air kolam</p>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <span class="stat-label">Status Peringatan</span>
+                            <span class="warning-status">Perlu Perhatian</span>
+                        </div>
+                    </div>
+
+                    <!-- CARD ACIDITY LEVELS -->
+                    <div class="card bottom-card acidity-card">
+
+                        <div class="card-header">
+                            <div>
+                                <span class="card-title-sm">Acidity Levels</span>
+                                <div class="card-subtitle">Keseimbangan pH Air</div>
+                            </div>
+
+                            <div class="icon-box">
+                                <i data-lucide="test-tube-2"></i>
+                            </div>
+                        </div>
+
+                        <div class="gauge-container">
+                            <svg class="gauge-svg" viewBox="0 0 160 160" aria-label="Indikator pH air">
+                                <circle class="gauge-bg" cx="80" cy="80" r="65"></circle>
+                                <circle class="gauge-progress" cx="80" cy="80" r="65"></circle>
+                            </svg>
+
+                            <div class="gauge-text">
+                                <div class="gauge-val">7.4</div>
+                                <div class="gauge-label">OPTIMAL</div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <span class="stat-label">24h Stability</span>
+                            <span class="stability-value">98.2%</span>
+                        </div>
+                    </div>
+
+                    <!-- CARD JADWAL PAKAN -->
+                    <div class="card bottom-card feeder-card">
+
+                        <div class="card-header">
+                            <div>
+                                <span class="card-title-sm">Jadwal Pakan</span>
+                                <div class="card-subtitle">Automatic Feeding System</div>
+                            </div>
+
+                            <div class="icon-box feeder-icon">
+                                <i data-lucide="clock"></i>
+                            </div>
+                        </div>
+
+                        <div class="automation-item">
+                            <div class="icon-box container-icon">
+                                <i data-lucide="container"></i>
+                            </div>
+
+                            <div class="feeder-info">
+                                <div class="feeder-title">Automatic Feeder</div>
+                                <div class="feeder-desc">Pakan berikutnya: 18:30</div>
+                                <div class="feeder-desc">Takaran: 45 g pelet</div>
+                            </div>
+
+                            <label class="switch">
+                                <input type="checkbox" id="feederToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="card-footer">
+                            <span class="stat-label">Mode Pemberian Pakan</span>
+                            <span id="feederStatus" class="feeder-status">Aktif</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ============================= -->
+        <!-- PAGE: PROFILE                 -->
+        <!-- ============================= -->
+        <section id="profile" class="page">
+            <div class="profile-card">
+                <div class="profile-left">
+                    <img src="https://lh3.googleusercontent.com/a/ACg8ocKn4Hlc5Ntn3JzA_ALHbW59BOMD5AwA_HMvyDEX3RLb7Us2d8cI=s360-c-no" class="profile-img-lg">
+                    <div class="profile-actions">
+                        <button class="btn btn-edit">Edit Profil</button>
+                        <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
+                    </div>
+                </div>
+                <div class="profile-right">
+                    <h2>Rosa Mania</h2>
+                    <p>Pemilik Koi Farm & Kolektor Ikan Koi</p>
+
+                    <div class="info-grid">
+                        <div class="info-item"><label>Email</label><span>roses.koi@farm.com</span></div>
+                        <div class="info-item"><label>Telepon</label><span>+62 812-3456-7890</span></div>
+                        <div class="info-item"><label>Lokasi</label><span>Jember, Jawa Timur</span></div>
+                    </div>
+
+                    <div style="background:#f8fafc; padding:20px; border-radius:20px; border:1px solid #e2e8f0">
+                        <h4 style="color:var(--sidebar-bg); margin-bottom:10px">Statistik Akun</h4>
+                        <div style="display:flex; gap:30px">
+                            <div><small style="color:#94a3b8">Total Kolam</small><div style="font-weight:800; color:var(--sidebar-bg)">3 Unit</div></div>
+                            <div><small style="color:#94a3b8">Waktu Aktif</small><div style="font-weight:800; color:var(--sidebar-bg)">124 Hari</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================= -->
+        <!-- PAGE: MONITORING PH           -->
+        <!-- ============================= -->
+        <section id="monitoring" class="page">
+            <h1 style="color: var(--sidebar-bg); font-size: 28px; margin-bottom: 6px;">Monitoring pH</h1>
+            <p style="color: #64748b; margin-bottom: 18px;">Manajemen pH dan log aktivitas pemeriksaan secara real-time untuk ekosistem koi Anda.</p>
+
+            <div class="ph-grid">
+
+                <!-- KOLAM 1 -->
+                <div class="ph-card">
+                    <div class="ph-card-header">
+                        <div>
+                            <h3>Kolam 1</h3>
+                            <p>Kejernihan : 75%</p>
+                        </div>
+                        <i data-lucide="waves" class="wave-icon"></i>
+                    </div>
+
+                    <div class="ph-content-row">
+                        <div class="ph-gauge-wrapper">
+                            <div class="ph-circle normal">7.5</div>
+                        </div>
+                        <div class="ph-stats-side">
+                            <span class="label-small">Terakhir Makan</span>
+                            <span class="val-small">07:00</span>
+                            <span class="label-small">Kondisi Air</span>
+                            <div class="condition">Sangat Jernih</div>
+                        </div>
+                    </div>
+
+                    <button class="btn-instant-feed" onclick="instantFeed('Kolam 1')">Beri makan instan</button>
+                </div>
+
+                <!-- KOLAM 2 -->
+                <div class="ph-card">
+                    <div class="ph-card-header">
+                        <div>
+                            <h3>Kolam 2</h3>
+                            <p>Kejernihan : 56%</p>
+                        </div>
+                        <i data-lucide="waves" class="wave-icon"></i>
+                    </div>
+
+                    <div class="ph-content-row">
+                        <div class="ph-gauge-wrapper">
+                            <div class="ph-circle danger">5.6</div>
+                        </div>
+                        <div class="ph-stats-side">
+                            <span class="label-small">Terakhir Makan</span>
+                            <span class="val-small">07:00</span>
+                            <span class="label-small">Kondisi Air</span>
+                            <div class="condition">Sangat Jernih</div>
+                        </div>
+                    </div>
+
+                    <button class="btn-instant-feed" onclick="instantFeed('Kolam 2')">Beri makan instan</button>
+                </div>
+
+                <!-- KOLAM 3 -->
+                <div class="ph-card">
+                    <div class="ph-card-header">
+                        <div>
+                            <h3>Kolam 3</h3>
+                            <p>Kejernihan : 70%</p>
+                        </div>
+                        <i data-lucide="waves" class="wave-icon"></i>
+                    </div>
+
+                    <div class="ph-content-row">
+                        <div class="ph-gauge-wrapper">
+                            <div class="ph-circle normal">7.0</div>
+                        </div>
+                        <div class="ph-stats-side">
+                            <span class="label-small">Terakhir Makan</span>
+                            <span class="val-small">07:00</span>
+                            <span class="label-small">Kondisi Air</span>
+                            <div class="condition">Sangat Jernih</div>
+                        </div>
+                    </div>
+
+                    <button class="btn-instant-feed" onclick="instantFeed('Kolam 3')">Beri makan instan</button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ============================= -->
+        <!-- PAGE: STOK & RIWAYAT          -->
+        <!-- ============================= -->
+        <section id="stok" class="page">
+            <h1 style="color: var(--sidebar-bg); font-size: 28px; margin-bottom: 6px;">Stok & Riwayat</h1>
+            <p style="color: #64748b; margin-bottom: 18px; max-width: 600px;">Manajemen persediaan pakan dan log aktivitas pemberian makan real-time untuk ekosistem koi Anda.</p>
+
+            <div class="stok-layout">
+
+                <!-- Kartu Status Stok (Kiri) -->
+                <div class="stok-status-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                        <h3 style="font-size: 18px;">Status Stok</h3>
+                        <i data-lucide="box" style="color: var(--accent-green)"></i>
+                    </div>
+
+                    <!-- Aquarium 1 -->
+                    <div class="stok-item">
+                        <div class="stok-info-top">
+                            <span>Aquarium 1</span>
+                            <span class="percent">85%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: 85%; background: var(--accent-cyan);"></div>
+                        </div>
+                        <div class="stok-info-bottom" style="color: var(--text-muted);">Estimasi Habis: 12 Hari</div>
+                    </div>
+
+                    <!-- Aquarium 2 -->
+                    <div class="stok-item">
+                        <div class="stok-info-top">
+                            <span>Aquarium 2</span>
+                            <span class="percent" style="color: var(--accent-red)">12%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: 12%; background: var(--accent-red);"></div>
+                        </div>
+                        <div class="stok-info-bottom" style="color: var(--accent-red);">Stok Kritis!</div>
+                    </div>
+
+                    <!-- Aquarium 3 -->
+                    <div class="stok-item">
+                        <div class="stok-info-top">
+                            <span>Aquarium 3</span>
+                            <span class="percent" style="color: var(--accent-cyan)">42%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: 42%; background: var(--accent-green);"></div>
+                        </div>
+                        <div class="stok-info-bottom" style="color: var(--accent-green);">Segera Isi Ulang</div>
+                    </div>
+
+                    <!-- Aquarium 4 -->
+                    <div class="stok-item">
+                        <div class="stok-info-top">
+                            <span>Aquarium 4</span>
+                            <span class="percent" style="color: var(--accent-red)">12%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: 12%; background: var(--accent-red);"></div>
+                        </div>
+                        <div class="stok-info-bottom" style="color: var(--accent-red);">Stok Kritis!</div>
+                    </div>
+
+                    <!-- Aquarium 5 -->
+                    <div class="stok-item">
+                        <div class="stok-info-top">
+                            <span>Aquarium 5</span>
+                            <span class="percent" style="color: var(--accent-cyan)">42%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: 42%; background: var(--accent-green);"></div>
+                        </div>
+                        <div class="stok-info-bottom" style="color: var(--accent-green);">Segera Isi Ulang</div>
+                    </div>
+
+                    <!-- Aquarium 6 -->
+                    <div class="stok-item">
+                        <div class="stok-info-top">
+                            <span>Aquarium 6</span>
+                            <span class="percent">85%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: 85%; background: var(--accent-cyan);"></div>
+                        </div>
+                        <div class="stok-info-bottom" style="color: var(--text-muted);">Estimasi Habis: 12 Hari</div>
+                    </div>
+
+                </div>
+
+                <!-- Kartu Riwayat Tabel (Kanan) -->
+                <div class="riwayat-tabel-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+                        <div>
+                            <h3 style="font-size: 18px;">Riwayat Pemberian</h3>
+                            <p style="font-size: 11px; color: var(--text-muted);">Log aktivitas 7 hari terakhir</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="search-box" placeholder="Cari akuarium...">
+                            <button class="icon-btn" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 10px;">
+                                <i data-lucide="filter" style="width: 16px; color: white;"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Nama Kolam/Akuarium</th>
+                                <th>Jenis Pakan</th>
+                                <th>Jumlah (G)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Hari ini, 08:30</td>
+                                <td>Aquarium 1</td>
+                                <td>Growth Formula</td>
+                                <td>150g</td>
+                                <td><span class="status-pill status-berhasil">Berhasil</span></td>
+                            </tr>
+                            <tr>
+                                <td>Hari ini, 15:19</td>
+                                <td>Aquarium 5</td>
+                                <td>Growth Formula</td>
+                                <td>150g</td>
+                                <td><span class="status-pill status-manual">Manual</span></td>
+                            </tr>
+                            <tr>
+                                <td>Hari ini, 01:00</td>
+                                <td>Aquarium 4</td>
+                                <td>Growth Formula</td>
+                                <td>150g</td>
+                                <td><span class="status-pill status-berhasil">Berhasil</span></td>
+                            </tr>
+                            <tr>
+                                <td>Kemarin, 17:15</td>
+                                <td>Aquarium 2</td>
+                                <td>Wheat Germ</td>
+                                <td>45g</td>
+                                <td><span class="status-pill status-berhasil">Berhasil</span></td>
+                            </tr>
+                            <tr>
+                                <td>Kemarin, 08:30</td>
+                                <td>Aquarium 3</td>
+                                <td>Growth Formula</td>
+                                <td>150g</td>
+                                <td><span class="status-pill status-manual">Manual</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+                        <span style="font-size: 11px; color: var(--text-muted);">Menampilkan 3 dari 128 data</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn" style="padding: 6px 12px; font-size: 11px; background: rgba(255,255,255,0.05); color: white;">Sebelumnya</button>
+                            <button class="btn" style="padding: 6px 12px; font-size: 11px; background: rgba(255,255,255,0.05); color: white;">Berikutnya</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistik Bawah -->
+            <div class="bottom-stok-stats">
+                <div class="stat-mini-card">
+                    <span>Pemberian Hari Ini</span>
+                    <h3>450g</h3>
+                </div>
+                <div class="stat-mini-card" style="background: var(--accent-green);">
+                    <span style="color: var(--sidebar-bg)">Pemberian Bulanan</span>
+                    <h3 style="color: var(--sidebar-bg)">111kg</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================= -->
+        <!-- PAGE: JADWAL                  -->
+        <!-- ============================= -->
+        <section id="jadwal" class="page">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;">
+                <div>
+                    <h1 style="color: var(--sidebar-bg); font-size: 28px; margin-bottom: 5px;">Jadwal Pakan</h1>
+                    <p style="color: #64748b;">Atur nutrisi ekosistem Koi Anda dengan presisi.</p>
+                </div>
+                <button class="btn" style="margin-top: 6px; background: var(--accent-cyan); color: var(--sidebar-bg); padding: 12px 20px; border-radius: 15px; font-weight: 800; display: flex; align-items: center; gap: 10px;" onclick="toggleModal(true)">
+                    <i data-lucide="plus"></i> Tambah Jadwal
+                </button>
+            </div>
+
+            <div class="schedule-container">
+
+                <!-- Timeline Section -->
+                <div class="timeline-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-size: 18px;"><i data-lucide="calendar" style="width:18px; vertical-align:middle; margin-right:8px"></i> Timeline Hari Ini</h3>
+                        <span style="font-size: 12px; background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 20px;">Senin, 24 Mei</span>
+                    </div>
+
+                    <div class="timeline-list">
+                        <div class="timeline-item">
+                            <div style="display: flex; align-items: center;">
+                                <div class="timeline-time">07:00 <small style="font-size: 10px; color: var(--text-muted)">WIB</small></div>
+                                <div>
+                                    <div style="font-weight: 700;">Pakan Pagi (Kolam 1)</div>
+                                    <div style="font-size: 11px; color: rgba(255,255,255,0.85)">Dosis: 150g • Suhu Ideal: 24°C</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <i data-lucide="edit-3" style="width: 16px; cursor: pointer;"></i>
+                                <i data-lucide="trash-2" style="width: 16px; cursor: pointer; color: var(--accent-red)"></i>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item" style="border: 1px solid var(--accent-cyan); background: rgba(0, 229, 255, 0.05);">
+                            <div style="display: flex; align-items: center;">
+                                <div class="timeline-time">12:30 <small style="font-size: 10px; color: var(--text-muted)">WIB</small></div>
+                                <div>
+                                    <div style="font-weight: 700;">Pakan Siang (Kolam 2)</div>
+                                    <div style="font-size: 11px; color: rgba(255,255,255,0.85)">Dosis: 100g • Multi-vitamin Mix</div>
+                                </div>
+                            </div>
+                            <span style="background: var(--accent-green); color: var(--sidebar-bg); font-size: 10px; padding: 4px 10px; border-radius: 6px; font-weight: 800;">Siap</span>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div style="display: flex; align-items: center;">
+                                <div class="timeline-time">18:00 <small style="font-size: 10px; color: var(--text-muted)">WIB</small></div>
+                                <div>
+                                    <div style="font-weight: 700;">Pakan Malam (Kolam 3)</div>
+                                    <div style="font-size: 11px; color: rgba(255,255,255,0.85)">Dosis: 80g • Easy Digest</div>
+                                </div>
+                            </div>
+                            <i data-lucide="edit-3" style="width: 16px; cursor: pointer;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Riwayat Pakan Section -->
+                <div class="history-card">
+                    <h3 style="font-size: 18px; margin-bottom: 14px;"><i data-lucide="history" style="width:18px; vertical-align:middle; margin-right:8px"></i> Riwayat Pakan</h3>
+
+                    <div class="history-item">
+                        <div style="font-size: 10px; color: var(--accent-cyan); font-weight: 700; margin-bottom: 5px;">SUKSES - 07:02 AM</div>
+                        <div style="font-weight: 700; font-size: 13px;">Auto-Feeder: Pakan Pagi</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.85)">Dispensed: 152g (Auto-corrected)</div>
+                    </div>
+
+                    <div class="history-item">
+                        <div style="font-size: 10px; color: var(--accent-cyan); font-weight: 700; margin-bottom: 5px;">SUKSES - 18:15 PM</div>
+                        <div style="font-weight: 700; font-size: 13px;">Manual: Pakan Malam</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.85)">Dispensed: 80g • Oleh: User Admin</div>
+                    </div>
+
+                    <div class="history-item fail">
+                        <div style="font-size: 10px; color: var(--accent-red); font-weight: 700; margin-bottom: 5px;">GAGAL - 12:30 PM</div>
+                        <div style="font-weight: 700; font-size: 13px;">Auto-Feeder: Pakan Siang</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.85)">Error: Sensor pakan tersumbat</div>
+                    </div>
+
+                    <div class="history-item">
+                        <div style="font-size: 10px; color: var(--accent-cyan); font-weight: 700; margin-bottom: 5px;">SUKSES - 07:02 AM</div>
+                        <div style="font-weight: 700; font-size: 13px;">Auto-Feeder: Pakan Pagi</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.85)">Dispensed: 152g (Auto-corrected)</div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 14px;">
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.85); cursor: pointer;">Lihat Semua Riwayat</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sisa Stok Mini Cards -->
+            <div style="display: flex; gap: 14px; max-width: 960px;">
+                <div class="card" style="flex: 1; background: #dbeafe; color: #1e40af; display: flex; align-items: center; gap: 16px; padding: 12px 16px;">
+                    <div style="background: white; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;"><i data-lucide="archive"></i></div>
+                    <div>
+                        <div style="font-size: 10px; text-transform: uppercase;">Sisa Stok Pakan</div>
+                        <div style="font-size: 20px; font-weight: 800;">4.2 <small style="font-size: 14px">kg</small></div>
+                    </div>
+                </div>
+                <div class="card" style="flex: 1; background: #dcfce7; color: #166534; display: flex; align-items: center; gap: 16px; padding: 12px 16px;">
+                    <div style="background: white; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;"><i data-lucide="check-circle"></i></div>
+                    <div>
+                        <div style="font-size: 10px; text-transform: uppercase;">Target Hari Ini</div>
+                        <div style="font-size: 20px; font-weight: 800;">33% <small style="font-size: 14px">selesai</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Articles -->
+            <div class="article-grid">
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1517361265-3bd77c6f1689?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D">
+                    <span style="background: var(--accent-cyan); color: var(--sidebar-bg); font-size: 10px; padding: 4px 10px; border-radius: 5px; width: fit-content; margin-bottom: 10px;">TIPS NUTRISI</span>
+                    <h4 style="font-size: 16px;">Suhu Air & Porsi Pakan</h4>
+                    <p style="font-size: 11px; opacity: 0.8;">Pelajari cara menyesuaikan porsi pakan berdasarkan suhu air kolam.</p>
+                </div>
+                <div class="article-card">
+                    <img src="https://media.istockphoto.com/id/2175380330/photo/hand-holding-fish-food-for-feeding-koi-fish-in-the-natural-pond.webp?a=1&b=1&s=612x612&w=0&k=20&c=TtnpK0PfFh_1FUVXvPb8cFn0Mn3h7Pb-eeXxZ9Arvrk=">
+                    <span style="background: var(--accent-green); color: var(--sidebar-bg); font-size: 10px; padding: 4px 10px; border-radius: 5px; width: fit-content; margin-bottom: 10px;">UPDATE STOK</span>
+                    <h4 style="font-size: 16px;">Beli Pakan Premium</h4>
+                    <p style="font-size: 11px; opacity: 0.8;">Stok High Growth menipis. Pesan sekarang melalui marketplace resmi.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODAL TAMBAH JADWAL BARU -->
+        <div class="modal-overlay" id="addScheduleModal">
+            <div class="modal-content">
+                <h2 style="font-size: 28px;">Tambah Jadwal Baru</h2>
+                <p style="color: #64748b; font-size: 14px;">Atur presisi nutrisi untuk ekosistem Koi Anda.</p>
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label><i data-lucide="clock" style="width: 14px; vertical-align: middle;"></i> Waktu Pemberian Pakan</label>
+                        <input type="time" value="08:00">
+                    </div>
+                    <div class="input-group">
+                        <label><i data-lucide="target" style="width: 14px; vertical-align: middle;"></i> Target Dispenser</label>
+                        <select>
+                            <option>Kolam 1</option>
+                            <option>Kolam 2</option>
+                            <option>Kolam 3</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label><i data-lucide="layers" style="width: 14px; vertical-align: middle;"></i> Jenis Pakan</label>
+                        <select>
+                            <option>High-Protein Pellets</option>
+                            <option>Wheat Germ</option>
+                            <option>Growth Formula</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label><i data-lucide="scale" style="width: 14px; vertical-align: middle;"></i> Takaran (Gram)</label>
+                        <div style="position: relative;">
+                            <input type="number" placeholder="500">
+                            <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-weight: 700;">gr</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label><i data-lucide="repeat" style="width: 14px; vertical-align: middle;"></i> Pengulangan Jadwal</label>
+                    <div class="days-row">
+                        <div class="day-chip active">SEN</div>
+                        <div class="day-chip active">SEL</div>
+                        <div class="day-chip active">RAB</div>
+                        <div class="day-chip active">KAM</div>
+                        <div class="day-chip active">JUM</div>
+                        <div class="day-chip">SAB</div>
+                        <div class="day-chip">MIN</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick="toggleModal(false)">Batal</button>
+                    <button class="btn-save" onclick="saveNewSchedule()">Simpan Jadwal</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Inisialisasi ikon Lucide (cukup sekali)
+        lucide.createIcons();
+
+        // =========================
+        // NAVIGASI HALAMAN
+        // =========================
+        function showPage(pageId, element) {
+            // Sembunyikan semua halaman, tampilkan yang dipilih
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            // Update menu sidebar (kalau dari avatar/profil, semua menu dinonaktifkan)
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            // Tutup popup notifikasi dan kembali ke atas halaman
+            document.getElementById('notifPopup').style.display = 'none';
+            document.querySelector('main').scrollTo({ top: 0 });
+        }
+
+        // =========================
+        // HEADER SAAT SCROLL
+        // (yang scroll adalah <main>, bukan window)
+        // =========================
+        const mainEl = document.querySelector('main');
+        const headerEl = document.querySelector('header');
+
+        mainEl.addEventListener('scroll', () => {
+            headerEl.classList.toggle('scrolled', mainEl.scrollTop > 30);
+        });
+
+        // =========================
+        // NOTIFIKASI
+        // =========================
+        function togglePopup(id) {
+            const popup = document.getElementById(id);
+            popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // =========================
+        // LOGOUT
+        // =========================
+        function handleLogout() {
+            if (confirm("Apakah Anda yakin ingin keluar dari sistem AIIRRR?")) {
+                window.location.href = "login";
+            }
+        }
+
+        // =========================
+        // BERI MAKAN INSTAN
+        // =========================
+        function instantFeed(kolamName) {
+            alert("Instruksi dikirim: Memberi makan instan ke " + kolamName + ". Dispenser diaktifkan!");
+        }
+
+        // =========================
+        // MODAL TAMBAH JADWAL
+        // =========================
+        function toggleModal(show) {
+            document.getElementById('addScheduleModal').style.display = show ? 'flex' : 'none';
+        }
+
+        document.querySelectorAll('.day-chip').forEach(chip => {
+            chip.addEventListener('click', function () {
+                this.classList.toggle('active');
+            });
+        });
+
+        function saveNewSchedule() {
+            alert("Jadwal pakan baru berhasil disimpan ke sistem!");
+            toggleModal(false);
+        }
+
+        // =========================
+        // KLIK DI LUAR (popup & modal) - digabung jadi satu
+        // =========================
+        window.addEventListener('click', function (event) {
+            // Tutup popup notifikasi jika klik di luar header
+            if (!event.target.closest('.header-actions')) {
+                document.getElementById('notifPopup').style.display = 'none';
+            }
+            // Tutup modal jika klik area gelap di luar konten
+            const modal = document.getElementById('addScheduleModal');
+            if (event.target === modal) {
+                toggleModal(false);
+            }
+        });
+
+        // =========================
+        // TOGGLE AUTOMATIC FEEDER
+        // =========================
+        const feederToggle = document.getElementById("feederToggle");
+        const feederStatus = document.getElementById("feederStatus");
+
+        feederToggle.addEventListener("change", function () {
+            if (this.checked) {
+                feederStatus.textContent = "Aktif";
+                feederStatus.classList.remove("feeder-off");
+            } else {
+                feederStatus.textContent = "Nonaktif";
+                feederStatus.classList.add("feeder-off");
+            }
+        });
+    </script>
+</body>
+</html>
